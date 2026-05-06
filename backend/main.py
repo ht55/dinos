@@ -12,6 +12,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
+import asyncio
 
 from models import (
     DebateState,
@@ -71,7 +72,6 @@ def sse(event: str, data: dict) -> str:
 # ========================================
 # SSE stream
 # ========================================
-
 async def stream_session(session_id: str) -> AsyncGenerator[str, None]:
     print(f"🔍 stream_session called for {session_id}")
 
@@ -82,7 +82,25 @@ async def stream_session(session_id: str) -> AsyncGenerator[str, None]:
 
     config = {"configurable": {"thread_id": session_id}}
 
+    # ==================== Keep-alive for Chrome ====================
+    keep_alive_task = None
+
+    async def keep_alive():
+        """Send : ping every 4 seconds to keep Chrome connection alive"""
+        try:
+            while True:
+                await asyncio.sleep(4)
+                print(f"[Keep-alive] PING sent for session {session_id}")
+                yield ": ping\n\n"
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            print(f"[Keep-alive] Error: {e}")
+
     try:
+        # Correct way to start async generator
+        keep_alive_task = asyncio.create_task(keep_alive().__anext__())
+
         input_state = session.pop("initial_state", None)
         print(f"🚀 Starting/Resuming with input_state: {bool(input_state)}")
 
@@ -95,7 +113,6 @@ async def stream_session(session_id: str) -> AsyncGenerator[str, None]:
             for node_name, node_output in chunk.items():
                 print(f"  → node: {node_name}")
 
-                # Topic Classifier
                 if node_name == "topic_classifier":
                     yield sse("category_detected", {
                         "category": node_output.get("category", ""),
@@ -103,34 +120,27 @@ async def stream_session(session_id: str) -> AsyncGenerator[str, None]:
                         "grok_position": node_output.get("grok_position", ""),
                     })
 
-                # Opening Claims
                 elif node_name == "opening_claims":
                     claude_claims = node_output.get("claude_claims", [])
                     grok_claims = node_output.get("grok_claims", [])
-
                     if claude_claims and grok_claims:
                         c = claude_claims[0]
                         g = grok_claims[0]
                         active_sessions[session_id]["current_round"] = 1
-
                         yield sse("opening_round", {
                             "round": 1,
                             "claude": _claim_payload(c),
                             "grok": _claim_payload(g),
                         })
 
-                # Rebuttal
                 elif node_name == "rebuttal":
                     current_round = node_output.get("round", 0)
                     active_sessions[session_id]["current_round"] = current_round
-
                     claude_claims = node_output.get("claude_claims", [])
                     grok_claims = node_output.get("grok_claims", [])
-
                     if claude_claims and grok_claims:
                         c = claude_claims[-1]
                         g = grok_claims[-1]
-
                         yield sse("rebuttal_round", {
                             "round": current_round,
                             "claude": _claim_payload(c),
@@ -141,7 +151,6 @@ async def stream_session(session_id: str) -> AsyncGenerator[str, None]:
                             "grok_confidence": node_output.get("grok_confidence", 0.8),
                         })
 
-                # Belief Updater
                 elif node_name == "belief_updater":
                     meta = node_output.get("latest_belief_meta", {})
                     if meta:
@@ -175,22 +184,27 @@ async def stream_session(session_id: str) -> AsyncGenerator[str, None]:
         error_msg = str(e).lower()
         print(f"💥 [STREAM] Exception caught: {type(e).__name__}")
 
-        # 正常なinterrupt（user_turnで止まる）はerror扱いしない
         if any(k in error_msg for k in ["interrupt", "user_turn", "checkpoint", "break", "stop", "paused"]):
-            print("🛑 Normal interrupt at user_turn — sending awaiting_user and stopping stream")
+            print("🛑 Normal interrupt at user_turn — sending awaiting_user")
             current_round = _get_current_round(session_id) or 1
             yield sse("awaiting_user", {
                 "round": current_round,
                 "options": ["continue", "intervene", "roleswap", "end"],
             })
-            return  # ← これで余計なイベントを止める
+            return
 
-        # 本当に異常なエラーの場合のみ
         print("❌ Unexpected real error")
         import traceback
         traceback.print_exc()
         yield sse("error", {"message": str(e)})
 
+    finally:
+        if keep_alive_task:
+            keep_alive_task.cancel()
+            try:
+                await keep_alive_task
+            except asyncio.CancelledError:
+                pass
 
 def _claim_payload(claim: dict) -> dict:
     """Build a JSON-safe claim payload for the frontend."""
