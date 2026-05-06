@@ -1,8 +1,8 @@
 # ⚔️ dinos.ext / Battlefield
 
 <p align="center">
-  <img src="dino1.png" height="200" alt="App Screenshot" />
-  <img src="dino2.png" height="200" alt="App Screenshot" />
+  <img src="dinos1.png" height="200" alt="App Screenshot" />
+  <img src="dinos2.png" height="200" alt="App Screenshot" />
 </p>
 
 **🤖 Live Demo → [dino.ext/Battlefield](https://dinos.ht55.dev)**
