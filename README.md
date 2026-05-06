@@ -1,6 +1,11 @@
 # ⚔️ dinos.ext / Battlefield
 
-**[Live Demo](https://ht55.dev/dinos)**
+<p align="center">
+  <img src="dino1.png" height="200" alt="App Screenshot" />
+  <img src="dino2.png" height="200" alt="App Screenshot" />
+</p>
+
+**🤖 Live Demo → [dino.ext/Battlefield](https://dinos.ht55.dev)**
 
 ---
 
@@ -147,5 +152,5 @@ MIT
 
 ---
 
-*Made with intellectual violence and love for good arguments.*
-*Try a controversial or unsolvable topic. Things get heated fast — and defeating both AIs simultaneously is kind of fun lol.*
+* Made with intellectual violence and love for good arguments.
+* Try a controversial or unsolvable topic. Things get heated fast — and defeating both AIs simultaneously is kind of fun lol.
