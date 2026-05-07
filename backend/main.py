@@ -48,6 +48,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://*.vercel.app",
+        "https://dinos.ht55.dev",
         os.getenv("FRONTEND_URL", ""),
     ],
     allow_credentials=True,
