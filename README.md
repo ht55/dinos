@@ -5,7 +5,7 @@
   <img src="dinos2.png" height="200" alt="App Screenshot" />
 </p>
 
-**🤖 Live Demo → [dino.ext/Battlefield](https://dinos.ht55.dev)**
+**🤖 Live Demo → [dinos.ext/Battlefield](https://dinos.ht55.dev)**
 
 ---
 
