@@ -19,6 +19,17 @@ There is no judge, no automatic verdict, and no persistent state by design.
 
 ---
 
+## Why This Exists
+
+The smarter frontier models get, the more convincing their failures become. Hallucinations don't disappear; they get harder to spot. Logical inconsistencies don't vanish; they get buried under more sophisticated language. Bias doesn't go away; it gets dressed up as balanced reasoning.
+
+I built Battlefield because I wanted a system that took that problem seriously at the structural level, not just as a UI feature, but as an architectural constraint. 
+Most multi-agent systems treat the human as an observer. Here, the human is embedded in the graph as an active third agent with intervention rights at every round, not just at the end. The assumption is that a human who can spot a flawed premise, cite a better source, or call out a topic shift mid-debate is more valuable than any automated judge, and that AI however capable should not be the last word on what you conclude.
+
+This does assume something of the human: that they're willing to engage critically, not just watch. 
+
+---
+
 ## Battle Modes
 
 | Mode | Claude | Grok | Best for |
