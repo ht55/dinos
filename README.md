@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="dinos1.png" height="200" alt="App Screenshot" />
-  <img src="dinos2.png" height="200" alt="App Screenshot" />
+  <img src="dinos4.png" height="200" alt="App Screenshot" />
 </p>
 
 **🤖 Live Demo → [dinos.ext/Battlefield](https://dinos.ht55.dev)**
