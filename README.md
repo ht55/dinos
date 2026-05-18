@@ -161,6 +161,8 @@ In many multi-agent systems, a strong "judge" agent collapses the outputs of oth
 
 MIT
 
+© ht55.dev - 2026
+
 ---
 
 * Made with intellectual violence and love for good arguments.
